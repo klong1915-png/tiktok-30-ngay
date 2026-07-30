@@ -1,0 +1,534 @@
+<div id="app">
+<style>
+  :root{
+    --ink:#14161a;
+    --ink-soft:#5b616b;
+    --paper:#e6e4de;
+    --card:#fdfcfb;
+    --line:#cfccc4;
+    --blue:#2b4cf2;
+    --coral:#ff3b5c;
+    --teal:#0e8f6e;
+    --graphite:#3d4450;
+    --amber:#c2761e;
+  }
+  #app *{box-sizing:border-box}
+  #app{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    padding:22px 18px 40px;
+    line-height:1.5;
+  }
+  #app .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace}
+
+  /* ---------- head ---------- */
+  #app .eyebrow{
+    display:flex;flex-wrap:wrap;gap:10px 18px;align-items:baseline;
+    font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);
+    border-bottom:1px solid var(--line);padding-bottom:8px;
+  }
+  #app .eyebrow input{
+    font:inherit;letter-spacing:.08em;text-transform:none;
+    background:transparent;border:0;border-bottom:1px dashed var(--line);
+    color:var(--ink);padding:2px 4px;min-width:120px;
+  }
+  #app .eyebrow input:focus{outline:2px solid var(--blue);outline-offset:2px}
+  #app h1{
+    font-size:clamp(30px,6.2vw,58px);
+    line-height:.94;letter-spacing:-.035em;font-weight:800;
+    margin:16px 0 4px;text-transform:uppercase;
+  }
+  #app h1 em{font-style:normal;color:var(--coral)}
+  #app .dek{max-width:56ch;color:var(--ink-soft);font-size:14px;margin:0 0 20px}
+
+  /* ---------- filmstrip (signature) ---------- */
+  #app .strip-wrap{position:relative;margin-bottom:26px}
+  #app .strip{
+    display:flex;gap:2px;background:var(--ink);
+    padding:9px 6px;border-radius:3px;overflow-x:auto;
+  }
+  #app .frame{
+    position:relative;flex:1 0 20px;min-width:20px;height:46px;
+    background:#22262e;border:0;padding:0;cursor:pointer;border-radius:1px;
+    display:flex;align-items:flex-end;justify-content:center;
+    transition:transform .18s ease;
+  }
+  #app .frame:hover{transform:translateY(-3px)}
+  #app .frame:focus-visible{outline:2px solid #fff;outline-offset:1px}
+  #app .frame .bar{position:absolute;left:0;right:0;bottom:0;background:var(--c);height:0;transition:height .3s ease}
+  #app .frame .top{position:absolute;left:0;right:0;top:0;height:3px;background:var(--c);opacity:.55}
+  #app .frame .n{
+    position:relative;font-family:ui-monospace,Menlo,monospace;font-size:9px;
+    color:#fff;opacity:.6;padding-bottom:3px;
+  }
+  #app .frame[data-on="1"] .n{opacity:1;font-weight:700}
+  #app .frame[aria-current="true"]{outline:2px solid #fff;outline-offset:1px;transform:translateY(-3px)}
+  #app .sprockets{display:flex;gap:2px;padding:0 6px;margin-top:3px}
+  #app .sprockets span{flex:1 0 20px;min-width:20px;height:4px;background:var(--line);border-radius:1px}
+
+  /* ---------- layout ---------- */
+  #app .grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:18px;align-items:start}
+  @media (max-width:820px){#app .grid{grid-template-columns:1fr}}
+
+  #app .card{background:var(--card);border:1px solid var(--line);border-radius:4px}
+  #app .card + .card{margin-top:18px}
+  #app .card-h{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    padding:11px 14px;border-bottom:1px solid var(--line);
+  }
+  #app .card-h span{
+    font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-soft);
+  }
+
+  /* ---------- today panel ---------- */
+  #app .day-head{padding:16px 18px 14px;border-bottom:1px solid var(--line)}
+  #app .day-code{
+    display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:11px;
+    letter-spacing:.1em;background:var(--phase);color:#fff;padding:3px 8px;border-radius:2px;
+  }
+  #app .day-phase{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-left:10px}
+  #app .day-title{font-size:clamp(20px,3.4vw,29px);font-weight:750;letter-spacing:-.02em;line-height:1.15;margin:12px 0 0}
+  #app .kpi{
+    display:flex;gap:8px;align-items:baseline;margin-top:12px;padding-top:12px;
+    border-top:1px dashed var(--line);font-size:13.5px;
+  }
+  #app .kpi b{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+
+  #app .tasks{list-style:none;margin:0;padding:6px 0}
+  #app .tasks li{border-bottom:1px solid #efedea}
+  #app .tasks li:last-child{border-bottom:0}
+  #app .tasks label{display:flex;gap:12px;align-items:flex-start;padding:11px 18px;cursor:pointer;font-size:14.5px}
+  #app .tasks label:hover{background:#f6f5f2}
+  #app .tasks input{appearance:none;margin:2px 0 0;width:17px;height:17px;flex:none;border:1.5px solid var(--graphite);border-radius:2px;cursor:pointer;position:relative}
+  #app .tasks input:checked{background:var(--phase);border-color:var(--phase)}
+  #app .tasks input:checked::after{content:"";position:absolute;left:4.5px;top:1px;width:5px;height:10px;border:2px solid #fff;border-top:0;border-left:0;transform:rotate(42deg)}
+  #app .tasks input:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  #app .tasks input:checked + span{color:var(--ink-soft);text-decoration:line-through}
+  #app .tip{
+    margin:0;padding:13px 18px;background:#f4f2ee;border-top:1px solid var(--line);
+    font-size:13px;color:var(--graphite);
+  }
+  #app .tip b{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:3px}
+  #app .nav{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
+  #app button.btn{
+    font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    background:var(--ink);color:#fff;border:0;padding:9px 14px;border-radius:2px;cursor:pointer;
+  }
+  #app button.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  #app button.btn:hover{opacity:.85}
+  #app button.btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+  /* ---------- metrics ---------- */
+  #app table{width:100%;border-collapse:collapse;font-size:13px}
+  #app th{
+    font-family:ui-monospace,Menlo,monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink-soft);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);font-weight:600;
+  }
+  #app td{padding:0;border-bottom:1px solid #efedea}
+  #app td:first-child{padding:0 10px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--ink-soft);width:52px}
+  #app td input{width:100%;font:inherit;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;border:0;background:transparent;padding:9px 10px;color:var(--ink)}
+  #app td input:focus{outline:2px solid var(--blue);outline-offset:-2px;background:#fff}
+  #app .spark{display:flex;align-items:flex-end;gap:2px;height:52px;padding:14px 12px 0}
+  #app .spark i{flex:1;background:var(--blue);min-height:1px;border-radius:1px 1px 0 0;opacity:.85}
+  #app .spark-note{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.08em;color:var(--ink-soft);padding:6px 12px 12px;text-transform:uppercase}
+
+  /* ---------- diagnose ---------- */
+  #app .dx{margin:0;padding:4px 0}
+  #app .dx div{padding:11px 14px;border-bottom:1px solid #efedea;font-size:13px}
+  #app .dx div:last-child{border-bottom:0}
+  #app .dx b{display:block;color:var(--coral);font-size:13px;margin-bottom:2px}
+
+  /* ---------- all days ---------- */
+  #app details{border-bottom:1px solid #efedea}
+  #app details:last-child{border-bottom:0}
+  #app summary{
+    padding:10px 14px;cursor:pointer;font-size:13.5px;display:flex;gap:10px;align-items:baseline;
+  }
+  #app summary::marker{content:""}
+  #app summary::-webkit-details-marker{display:none}
+  #app summary code{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:#fff;background:var(--c);padding:2px 6px;border-radius:2px}
+  #app details ul{margin:0 0 12px;padding:0 16px 0 42px;font-size:13px;color:var(--graphite)}
+  #app details li{margin:4px 0}
+  #app .foot{
+    margin-top:20px;padding-top:12px;border-top:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;
+    font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);
+  }
+  @media (prefers-reduced-motion:reduce){#app *{transition:none!important}}
+</style>
+
+<div class="eyebrow">
+  <span>Phiếu công tác sản xuất</span>
+  <label>Kênh: <input id="chName" placeholder="@tenkenh" /></label>
+  <label>Ngách: <input id="chNiche" placeholder="vd: gia dụng bếp" /></label>
+  <label>Bắt đầu: <input id="chStart" type="date" /></label>
+  <span id="statProgress" class="mono">0/30 ngày xong</span>
+</div>
+
+<h1>Lịch dựng kênh<br>TikTok <em>30 ngày</em></h1>
+<p class="dek">Mỗi ngày một phiếu việc: làm gì, đăng bao nhiêu, số nào phải đạt. Tick xong việc, ghi số liệu vào bảng bên phải, và đọc phần chẩn đoán khi số đi sai hướng.</p>
+
+<div class="strip-wrap">
+  <div class="strip" id="strip" role="tablist" aria-label="30 ngày"></div>
+  <div class="sprockets" id="sprockets"></div>
+</div>
+
+<div class="grid">
+  <div>
+    <div class="card" id="today">
+      <div class="day-head">
+        <span class="day-code mono" id="dCode">D01 / 30</span><span class="day-phase" id="dPhase"></span>
+        <h2 class="day-title" id="dTitle"></h2>
+        <p class="kpi"><b>Mục tiêu</b><span id="dKpi"></span></p>
+      </div>
+      <ul class="tasks" id="dTasks"></ul>
+      <p class="tip"><b>Ghi chú vận hành</b><span id="dTip"></span></p>
+      <div class="nav">
+        <button class="btn ghost" id="prev">← Ngày trước</button>
+        <button class="btn" id="next">Ngày sau →</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><span>Toàn bộ 30 ngày</span><span id="phaseLegend"></span></div>
+      <div id="allDays"></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="card-h"><span>Số liệu theo ngày</span><span class="mono" id="metricSum">—</span></div>
+      <div class="spark" id="spark"></div>
+      <div class="spark-note">View theo ngày (cột cao nhất = <span id="sparkMax">0</span>)</div>
+      <table>
+        <thead><tr><th>Ngày</th><th>View</th><th>Follow mới</th><th>Click giỏ</th></tr></thead>
+        <tbody id="metricRows"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><span>Chẩn đoán khi số đi sai</span></div>
+      <div class="dx" id="dx"></div>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <span id="saveState">Tiến độ được lưu tự động</span>
+  <button class="btn ghost" id="reset">Xoá toàn bộ tiến độ</button>
+</div>
+</div>
+
+<script>
+(function(){
+  const PHASES = [
+    {id:1,name:"Nền móng",  from:1,  to:5,  c:"#2b4cf2"},
+    {id:2,name:"Test",      from:6,  to:14, c:"#ff3b5c"},
+    {id:3,name:"Scale",     from:15, to:23, c:"#0e8f6e"},
+    {id:4,name:"Hệ thống",  from:24, to:30, c:"#3d4450"}
+  ];
+
+  const DAYS = [
+    {t:"Chốt ngách và chân dung người xem", kpi:"Chưa đăng bài. Xong tài liệu ngách.", tip:"Ngách phải đủ sản phẩm để lặp lại 100 video. Ngách chỉ có 3 sản phẩm thì hết ý tưởng ở ngày 12.", k:[
+      "Chọn 1 ngách chính + 2 ngách phụ đều có sẵn sản phẩm affiliate",
+      "Viết chân dung người xem: tuổi, nghề, nỗi đau, lý do họ mua trong 15 giây",
+      "Liệt kê 10 chủ đề gốc, mỗi chủ đề phải đẻ được ít nhất 10 video"]},
+    {t:"Bóc 30 video viral của đối thủ", kpi:"30 video đã phân loại xong format.", tip:"Copy cấu trúc, không copy nội dung. Cấu trúc là thứ thuật toán thưởng, nội dung là thứ khán giả nhớ.", k:[
+      "Lưu 30 video trên 500k view cùng ngách vào một thư mục",
+      "Gõ lại 3 giây đầu của từng video: thoại nói gì, hình cho thấy gì",
+      "Phân loại format: review, POV, before–after, kể chuyện, so sánh",
+      "Khoanh 3 format xuất hiện nhiều nhất — đó là 3 format test đầu tiên"]},
+    {t:"Dựng kênh chuẩn trước khi đăng", kpi:"Hồ sơ kênh hoàn thiện 100%.", tip:"Chưa có nội dung thì chưa gắn link ngoài vào bio. Kênh trắng mà đã có link dễ bị soi.", k:[
+      "Username dễ đọc dễ gõ, tên kênh chứa từ khoá ngách",
+      "Avatar rõ chủ thể, bio một dòng lợi ích + một CTA",
+      "Điền đủ ngày sinh trên 18, số điện thoại, email xác thực",
+      "Chọn đúng loại tài khoản: Creator nếu làm nội dung, Business nếu sẽ chạy ads",
+      "Tạo sẵn 3 playlist rỗng theo 3 nhóm nội dung"]},
+    {t:"Nuôi tài khoản 45 phút, không đăng gì", kpi:"0 bài đăng. 45 phút hành vi đúng tệp.", tip:"Mục tiêu duy nhất của hôm nay: dạy For You hiểu tài khoản này thuộc tệp nào.", k:[
+      "Xem 45 phút video đúng ngách, xem hết video thay vì lướt",
+      "Like, lưu, bình luận thật trên 20 video cùng ngách",
+      "Search 10 từ khoá ngách và follow 20 kênh trong ngách",
+      "Không đăng bài, không đổi thiết bị hay mạng liên tục trong ngày"]},
+    {t:"30 ý tưởng và 4 nhóm nội dung", kpi:"Kho 30 ý tưởng có sẵn hook.", tip:"Có kho 30 ý tưởng trước khi đăng thì không bao giờ phải đăng bài cho có.", k:[
+      "Chia 4 nhóm: bắt trend, giá trị/mẹo, bán hàng mềm, hậu trường cá nhân",
+      "Viết 30 tiêu đề theo 3 kiểu hook: câu hỏi đau, con số cụ thể, phản đề",
+      "Gắn mỗi ý tưởng vào một trong 3 format đã chọn ở ngày 2",
+      "Chuẩn bị kho b-roll, nhạc và template dựng để không dựng lại từ đầu"]},
+
+    {t:"Đăng 3 video test 3 format", kpi:"Ít nhất 1 video vượt 1.000 view.", tip:"Không sửa caption, không xoá video trong 24 giờ đầu. Mọi thao tác đó reset phân phối.", k:[
+      "Đăng 3 video, mỗi video một format khác nhau",
+      "Đăng vào 11–13h và 19–22h, cách nhau tối thiểu 3 tiếng",
+      "Caption ngắn + 3 đến 5 hashtag đúng ngách, bỏ hashtag triệu view",
+      "Trả lời 100% bình luận trong 2 giờ đầu sau khi đăng"]},
+    {t:"Đọc số, đừng đọc cảm giác", kpi:"Tỷ lệ xem 3 giây đầu ≥ 40%.", tip:"Video nào giữ được 3 giây đầu tốt nhất thì hook đó thắng, kể cả khi tổng view của nó thấp hơn.", k:[
+      "Mở Analytics từng video: tỷ lệ xem hết, thời lượng xem trung bình, nguồn traffic",
+      "Ghi view, follow mới, click vào bảng số liệu bên phải",
+      "Khoanh video có tỷ lệ giữ 3 giây cao nhất và ghi lại hook của nó"]},
+    {t:"Nhân bản hook thắng", kpi:"Thời lượng xem trung bình cao hơn ngày 6.", tip:"Giữ nguyên khung hook, chỉ đổi chủ đề. Đây là lúc dùng tool clone concept để giữ đúng nhịp.", k:[
+      "Viết 3 script mới dùng đúng khung hook thắng của ngày 7",
+      "Đăng 3 video",
+      "Ghim một bình luận tạo tranh luận nhẹ để đẩy lượt bình luận"]},
+    {t:"Test độ dài và nhịp cắt", kpi:"1 video vượt 5.000 view.", tip:"Cắt bỏ mọi giây không mang thông tin mới. Nhịp quan trọng hơn độ dài.", k:[
+      "Cùng một chủ đề, đăng 3 bản: dưới 15 giây, 21–34 giây, 45–60 giây",
+      "Ghi lại bản nào giữ người xem lâu nhất theo phần trăm, không theo giây",
+      "Đặt lại tiêu chuẩn độ dài cho kênh dựa trên kết quả"]},
+    {t:"Test chữ trên hình và ảnh bìa", kpi:"Tỷ lệ xem 3 giây đầu tăng thêm 5 điểm.", tip:"Chữ trên hình phải đọc xong trong một nhịp mắt. Quá 7 từ là quá dài.", k:[
+      "3 video cùng nội dung, khác cách đặt chữ: hỏi, khẳng định, con số",
+      "Chọn ảnh bìa có mặt người hoặc kết quả rõ ràng",
+      "So sánh nguồn traffic từ Search giữa 3 video"]},
+    {t:"Ngày dọn dẹp kênh", kpi:"Kênh chỉ còn nội dung đúng tệp.", tip:"Video lệch tệp giữ lại sẽ kéo phân phối các video sau. Ẩn còn tốt hơn để.", k:[
+      "Ẩn hoặc xoá video dưới 200 view sau 72 giờ nếu lệch tệp nội dung",
+      "Gom video tốt vào playlist theo nhóm",
+      "Đăng 2 video theo format đang thắng"]},
+    {t:"Test giờ đăng", kpi:"Xác định 2 khung giờ tốt nhất.", tip:"Giờ vàng của ngách bạn không phải giờ vàng trên mạng. Chỉ số Follower activity mới đúng.", k:[
+      "Đăng 3 video ở 3 khung giờ khác nhau, cùng format",
+      "Đối chiếu với biểu đồ Follower activity trong Analytics",
+      "Chốt 2 khung giờ cố định cho 20 ngày còn lại"]},
+    {t:"Bắt một trend đúng ngách", kpi:"1 video dùng trend đạt trên mức trung bình kênh.", tip:"Trend chỉ dùng làm vỏ. Ruột vẫn phải là ngách, nếu không kênh sẽ bị loãng tệp.", k:[
+      "Chọn 1 âm thanh hoặc format đang lên trong ngách, không lấy trend chung",
+      "Ghép trend vào chủ đề ngách, giữ 3 giây đầu theo hook thắng",
+      "Đăng trong vòng 24 giờ kể từ khi phát hiện trend"]},
+    {t:"Tổng kết tuần: chốt một format chủ lực", kpi:"≥ 100 follower và 1 format chủ lực đã xác định.", tip:"Từ đây trở đi, 70% nội dung chạy một format. Đa dạng format lúc này chỉ làm chậm học máy.", k:[
+      "Xếp hạng toàn bộ video theo tỷ lệ xem hết, không theo view",
+      "Chốt 1 format chủ lực và 1 format dự bị",
+      "Viết lại bio và ghim video tốt nhất lên đầu"]},
+
+    {t:"Batch 15 video trong một buổi", kpi:"15 video sẵn sàng lên lịch.", tip:"Sản xuất theo lô: viết hết script, quay hết, dựng hết. Đừng làm xong từng video một.", k:[
+      "Viết 15 script theo format chủ lực trong một buổi",
+      "Quay gộp toàn bộ, giữ nguyên bối cảnh và ánh sáng",
+      "Dùng tool clone concept từ video thắng để giữ nhịp dựng",
+      "Lên lịch đăng 3 video mỗi ngày"]},
+    {t:"Tăng tần suất lên 3 bài một ngày", kpi:"Tổng view ngày tăng 50% so với ngày 14.", tip:"Tần suất chỉ tăng khi format đã ổn định. Tăng sớm thì chỉ nhân bản cái sai.", k:[
+      "Đăng 3 video theo lịch giờ đã chốt ở ngày 12",
+      "Rep bình luận trong 2 giờ đầu của mỗi video",
+      "Ghi số liệu cả 3 video vào bảng"]},
+    {t:"Mở luồng bán: gắn sản phẩm", kpi:"3 sản phẩm đã vào giỏ hàng của kênh.", tip:"Chọn sản phẩm theo tỷ lệ hoàn hàng và rating, không theo hoa hồng cao nhất.", k:[
+      "Đăng ký TikTok Shop hoặc chương trình affiliate của ngách",
+      "Chọn 3 sản phẩm rating trên 4.6, đã có đơn, hoa hồng chấp nhận được",
+      "Đặt tỷ lệ nội dung: 1 video bán trên 2 video giá trị"]},
+    {t:"Video bán hàng mềm", kpi:"Tỷ lệ click vào giỏ ≥ 1%.", tip:"Đừng nói giá trong 3 giây đầu. Cho thấy kết quả trước, nói sản phẩm sau.", k:[
+      "3 video dạng trải nghiệm thật, nêu vấn đề trước rồi mới đến sản phẩm",
+      "CTA vào giỏ ở giữa video và nhắc lại ở cuối",
+      "Ghim bình luận chứa hướng dẫn mua"]},
+    {t:"Livestream thử 45 phút", kpi:"Có người xem cùng lúc trên 10 và ít nhất 1 đơn.", tip:"Live đầu tiên là để quen máy và quen thoại, không phải để ra doanh số.", k:[
+      "Chuẩn bị 5 sản phẩm và kịch bản 45 phút chia theo vòng",
+      "Đăng 1 video thông báo live trước 2 tiếng",
+      "Sau live: cắt 3 đoạn hay nhất thành 3 video"]},
+    {t:"Tối đa hoá video đang lên", kpi:"Video đang lên có phần 2 trong 24 giờ.", tip:"Video đang lên là tài sản có hạn sử dụng vài ngày. Ưu tiên nó trước mọi việc khác.", k:[
+      "Với video trên 20k view: rep toàn bộ bình luận có câu hỏi",
+      "Làm ngay phần 2 trả lời bình luận nhiều like nhất",
+      "Cân nhắc chạy Promote ngân sách nhỏ nếu video đã bán được hàng"]},
+    {t:"Xây lý do để người ta bấm follow", kpi:"Tỷ lệ follow trên view tăng gấp đôi.", tip:"Người ta follow một series, không follow một video hay. Series phải có tên.", k:[
+      "Đặt tên một series và đăng cố định giờ mỗi ngày",
+      "Sửa bio thành lời hứa của series",
+      "Nhắc tên series ở giây cuối mỗi video trong series"]},
+    {t:"Tái sử dụng chéo nền tảng", kpi:"Top video đã lên đủ 3 nền tảng.", tip:"Đổi 3 giây đầu và tỷ lệ khung hình cho từng nền tảng, đừng đăng nguyên bản có watermark.", k:[
+      "Đăng lại 5 video tốt nhất sang Reels và Shorts, đổi 3 giây đầu",
+      "Xoá watermark và xuất lại đúng tỷ lệ từng nền tảng",
+      "Ghi lại nền tảng nào cho chi phí trên đơn thấp nhất"]},
+    {t:"Tổng kết: chốt công thức của kênh", kpi:"≥ 1.000 follower, đủ điều kiện live.", tip:"Công thức phải viết được thành một câu. Nếu chưa viết được thì chưa có công thức.", k:[
+      "Viết công thức kênh thành một câu: hook nào + format nào + độ dài nào",
+      "Xếp hạng sản phẩm theo doanh thu trên mỗi video",
+      "Chốt lịch đăng và lịch live cho tuần tiếp theo"]},
+
+    {t:"Viết SOP sản xuất cho team", kpi:"SOP một trang, người mới làm được ngay.", tip:"SOP tốt là SOP mà người mới vào làm ra video đạt mức trung bình của kênh trong ngày đầu.", k:[
+      "Viết SOP: nguồn ý tưởng, mẫu script, cách quay, cách dựng, cách đăng",
+      "Kèm 3 video mẫu chuẩn và 3 video mẫu lỗi",
+      "Giao thử một video cho người khác làm theo SOP"]},
+    {t:"Bảng số liệu và ngưỡng ra quyết định", kpi:"Mọi quyết định đều có ngưỡng số.", tip:"Ngưỡng phải quyết định trước khi nhìn số, không phải sau.", k:[
+      "Lập bảng theo dõi: view, giữ 3 giây, xem hết, follow, click, đơn",
+      "Đặt ngưỡng: dưới bao nhiêu thì dừng format, trên bao nhiêu thì nhân bản",
+      "Chốt lịch review số liệu 2 lần mỗi tuần"]},
+    {t:"Nhân bản sang kênh phụ", kpi:"Kênh phụ có 10 video và bài đầu trên 1.000 view.", tip:"Kênh phụ dùng để test rủi ro: sản phẩm mới, hook mạo hiểm, ngách lân cận.", k:[
+      "Mở 1 kênh phụ ngách lân cận, thiết bị và tài khoản tách biệt",
+      "Đăng 10 video tốt nhất đã đổi 3 giây đầu",
+      "So sánh chỉ số kênh phụ với kênh chính ở cùng mốc ngày"]},
+    {t:"Live bán 90 phút", kpi:"Doanh thu live cao hơn tổng doanh thu video trong ngày.", tip:"Vòng lặp 20 phút: chào, nêu vấn đề, demo, chốt, nhắc giỏ. Lặp lại cho người mới vào.", k:[
+      "Chốt 8 sản phẩm, xếp theo vòng 20 phút",
+      "Đăng 2 video kéo live trước và trong khi live",
+      "Sau live: cắt 5 đoạn thành video, ghi lại giờ có người xem cao nhất"]},
+    {t:"Tối ưu chi phí và thời gian", kpi:"Giảm 30% thời gian sản xuất trên mỗi video.", tip:"Đo thời gian thật cho từng khâu trước khi tối ưu, đừng đoán khâu nào chậm.", k:[
+      "Bấm giờ từng khâu: viết, quay, dựng, đăng",
+      "Đưa khâu chậm nhất vào tool hoặc template",
+      "Tính lại doanh thu trên mỗi giờ làm việc"]},
+    {t:"Kế hoạch 30 ngày tiếp theo", kpi:"Kế hoạch có mục tiêu số và người phụ trách.", tip:"Chọn một chỉ số chủ lực cho tháng sau. Nhiều mục tiêu ngang hàng thì không có mục tiêu nào.", k:[
+      "Chọn 1 chỉ số chủ lực cho tháng sau: doanh thu, follower hay giá trị đơn",
+      "Lên lịch nội dung 30 ngày theo series đã thắng",
+      "Phân việc theo SOP cho từng người trong team"]},
+    {t:"Chốt báo cáo và giao việc", kpi:"Báo cáo 1 trang + việc đã giao xong.", tip:"Báo cáo chỉ cần 3 phần: cái gì hiệu quả, cái gì bỏ, tháng sau làm gì.", k:[
+      "Viết báo cáo: format thắng, sản phẩm thắng, chi phí trên đơn",
+      "Ghi lại 3 thứ sẽ không làm lại trong tháng sau",
+      "Giao lịch đăng và chỉ tiêu cho từng người, chốt ngày review"]}
+  ];
+
+  const DX = [
+    ["View đứng ở 200–400 nhiều bài liên tiếp","Nội dung lệch tệp hoặc tài khoản đang bị giới hạn. Kiểm tra thông báo vi phạm, đăng 3 bài đúng ngách rõ ràng, tạm dừng gắn link 48 giờ."],
+    ["Tỷ lệ xem 3 giây đầu dưới 35%","Hook yếu. Viết lại 3 giây đầu: vào thẳng kết quả hoặc xung đột, bỏ mọi câu chào và giới thiệu."],
+    ["Xem hết cao nhưng ít follow","Thiếu lý do follow. Đóng nội dung thành series có tên và nhắc series ở giây cuối."],
+    ["View cao nhưng ít click giỏ","Sai sản phẩm hoặc CTA quá muộn. Đổi sản phẩm sang nhu cầu rõ hơn và chèn CTA ở giữa video."],
+    ["Follow tăng nhưng view giảm","Tệp bị loãng do đa dạng format quá sớm. Về một format chủ lực trong 7 ngày liền."],
+    ["View tốt nhưng không ra đơn","Người xem sai ý định. Chuyển từ nội dung giải trí sang nội dung so sánh và giải quyết vấn đề."]
+  ];
+
+  const phaseOf = d => PHASES.find(p => d >= p.from && d <= p.to);
+  const KEY = "tiktok30";
+  let S = {day:1, done:{}, m:{}, name:"", niche:"", start:""};
+  let cur = 1;
+
+  /* ---------- storage ---------- */
+  async function load(){
+    try{
+      const r = await window.storage.get(KEY);
+      if(r && r.value) S = Object.assign(S, JSON.parse(r.value));
+    }catch(e){ /* chưa có dữ liệu, dùng mặc định */ }
+  }
+  let t;
+  function save(){
+    clearTimeout(t);
+    t = setTimeout(async () => {
+      try{
+        await window.storage.set(KEY, JSON.stringify(S));
+        note("Đã lưu tiến độ");
+      }catch(e){ note("Không lưu được — tiến độ chỉ tồn tại trong phiên này"); }
+    }, 250);
+  }
+  function note(msg){ document.getElementById("saveState").textContent = msg; }
+
+  /* ---------- render ---------- */
+  function dayDone(d){
+    const n = DAYS[d-1].k.length;
+    let c = 0;
+    for(let i=0;i<n;i++) if(S.done[d+"-"+i]) c++;
+    return {c, n, full:c===n};
+  }
+
+  function renderStrip(){
+    const strip = document.getElementById("strip");
+    const spr = document.getElementById("sprockets");
+    strip.innerHTML = ""; spr.innerHTML = "";
+    for(let d=1; d<=30; d++){
+      const p = phaseOf(d), st = dayDone(d);
+      const b = document.createElement("button");
+      b.className = "frame"; b.style.setProperty("--c", p.c);
+      b.setAttribute("role","tab");
+      b.setAttribute("aria-current", d===cur ? "true" : "false");
+      b.setAttribute("aria-label","Ngày "+d+" — "+DAYS[d-1].t);
+      b.dataset.on = st.full ? "1" : "0";
+      b.innerHTML = '<span class="top"></span><span class="bar" style="height:'+Math.round(st.c/st.n*100)+'%"></span><span class="n">'+d+'</span>';
+      b.onclick = () => { cur = d; S.day = d; save(); renderAll(); };
+      strip.appendChild(b);
+      spr.appendChild(document.createElement("span"));
+    }
+    let full = 0;
+    for(let d=1; d<=30; d++) if(dayDone(d).full) full++;
+    document.getElementById("statProgress").textContent = full+"/30 ngày xong";
+    document.getElementById("phaseLegend").innerHTML = PHASES.map(p =>
+      '<b style="color:'+p.c+';font-weight:700">'+p.from+'–'+p.to+' '+p.name+'</b>').join(" · ");
+  }
+
+  function renderToday(){
+    const d = DAYS[cur-1], p = phaseOf(cur), card = document.getElementById("today");
+    card.style.setProperty("--phase", p.c);
+    document.getElementById("dCode").textContent = "D"+String(cur).padStart(2,"0")+" / 30";
+    document.getElementById("dCode").style.background = p.c;
+    document.getElementById("dPhase").textContent = "Giai đoạn "+p.id+" — "+p.name;
+    document.getElementById("dTitle").textContent = d.t;
+    document.getElementById("dKpi").textContent = d.kpi;
+    document.getElementById("dTip").textContent = d.tip;
+    const ul = document.getElementById("dTasks");
+    ul.innerHTML = "";
+    d.k.forEach((task,i) => {
+      const li = document.createElement("li");
+      const id = cur+"-"+i;
+      li.innerHTML = '<label><input type="checkbox" '+(S.done[id]?"checked":"")+'><span>'+task+'</span></label>';
+      li.querySelector("input").onchange = e => {
+        if(e.target.checked) S.done[id] = true; else delete S.done[id];
+        save(); renderStrip();
+      };
+      ul.appendChild(li);
+    });
+    document.getElementById("prev").disabled = cur===1;
+    document.getElementById("next").disabled = cur===30;
+  }
+
+  function renderAllDays(){
+    const box = document.getElementById("allDays");
+    box.innerHTML = "";
+    DAYS.forEach((d,i) => {
+      const n = i+1, p = phaseOf(n), st = dayDone(n);
+      const el = document.createElement("details");
+      el.style.setProperty("--c", p.c);
+      el.innerHTML = '<summary><code>D'+String(n).padStart(2,"0")+'</code>'+
+        '<span>'+d.t+'</span><span class="mono" style="margin-left:auto;font-size:10.5px;color:#5b616b">'+st.c+'/'+st.n+'</span></summary>'+
+        '<ul>'+d.k.map(k => "<li>"+k+"</li>").join("")+'<li style="color:#c2761e">Mục tiêu: '+d.kpi+'</li></ul>';
+      box.appendChild(el);
+    });
+  }
+
+  function renderMetrics(){
+    const tb = document.getElementById("metricRows");
+    tb.innerHTML = "";
+    for(let d=1; d<=30; d++){
+      const m = S.m[d] || {};
+      const tr = document.createElement("tr");
+      tr.innerHTML = '<td>D'+String(d).padStart(2,"0")+'</td>'+
+        ['v','f','c'].map(k => '<td><input inputmode="numeric" data-d="'+d+'" data-k="'+k+'" value="'+(m[k]??"")+'" placeholder="—"></td>').join("");
+      tb.appendChild(tr);
+    }
+    tb.querySelectorAll("input").forEach(inp => {
+      inp.onchange = e => {
+        const d = e.target.dataset.d, k = e.target.dataset.k;
+        const v = parseInt(e.target.value.replace(/\D/g,""),10);
+        S.m[d] = S.m[d] || {};
+        if(isNaN(v)) delete S.m[d][k]; else S.m[d][k] = v;
+        save(); renderSpark();
+      };
+    });
+    renderSpark();
+  }
+
+  function renderSpark(){
+    const vals = [];
+    for(let d=1; d<=30; d++) vals.push((S.m[d] && S.m[d].v) || 0);
+    const max = Math.max(1, ...vals);
+    document.getElementById("spark").innerHTML = vals.map(v =>
+      '<i style="height:'+Math.max(1, Math.round(v/max*100))+'%"></i>').join("");
+    document.getElementById("sparkMax").textContent = max.toLocaleString("vi-VN");
+    const sum = k => Object.values(S.m).reduce((a,m) => a + (m[k]||0), 0);
+    document.getElementById("metricSum").textContent =
+      sum("v").toLocaleString("vi-VN")+" view · +"+sum("f").toLocaleString("vi-VN")+" follow";
+  }
+
+  function renderDx(){
+    document.getElementById("dx").innerHTML = DX.map(([a,b]) =>
+      "<div><b>"+a+"</b>"+b+"</div>").join("");
+  }
+
+  function renderAll(){ renderStrip(); renderToday(); renderAllDays(); }
+
+  /* ---------- wire ---------- */
+  document.getElementById("prev").onclick = () => { if(cur>1){cur--; S.day=cur; save(); renderAll();} };
+  document.getElementById("next").onclick = () => { if(cur<30){cur++; S.day=cur; save(); renderAll();} };
+  document.getElementById("reset").onclick = () => {
+    S = {day:1, done:{}, m:{}, name:S.name, niche:S.niche, start:S.start};
+    cur = 1; save(); renderAll(); renderMetrics();
+    note("Đã xoá tiến độ, giữ lại thông tin kênh");
+  };
+  ["chName:name","chNiche:niche","chStart:start"].forEach(pair => {
+    const [id,key] = pair.split(":");
+    const el = document.getElementById(id);
+    el.oninput = () => { S[key] = el.value; save(); };
+  });
+
+  load().then(() => {
+    cur = S.day || 1;
+    document.getElementById("chName").value = S.name || "";
+    document.getElementById("chNiche").value = S.niche || "";
+    document.getElementById("chStart").value = S.start || "";
+    renderAll(); renderMetrics(); renderDx();
+  });
+})();
+</script>
