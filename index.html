@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xây kênh TikTok theo ngày — quy trình 30 ngày</title>
+<meta name="description" content="Quy trình xây kênh TikTok 30 ngày: mỗi ngày một mục tiêu, một checklist và một ô nhập số liệu.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#07080B; --panel:#0E1118; --panel2:#141926; --line:#222A3A;
+    --text:#E9EDF6; --muted:#7D879B; --accent:#22E6E0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--ink); color:var(--text); margin:0;
+    font-family:'Be Vietnam Pro',ui-sans-serif,system-ui,'Segoe UI',sans-serif;
+    font-size:14px; line-height:1.55; padding:22px 18px 56px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+  .cond{font-family:'Barlow Condensed','Be Vietnam Pro',sans-serif;text-transform:uppercase;letter-spacing:.06em;}
+  .eyebrow{font-size:11px;color:var(--muted);letter-spacing:.28em;}
+  h1{font-family:'Barlow Condensed','Be Vietnam Pro',sans-serif;font-weight:700;
+     font-size:clamp(30px,5.4vw,50px);line-height:.98;text-transform:uppercase;margin:6px 0 0;}
+  h1 em{font-style:normal;color:var(--accent);}
+  .sub{color:var(--muted);max-width:60ch;margin-top:8px;}
+
+  .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-top:20px;}
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .label{font-size:10px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;}
+  input,select,textarea{background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13px;outline:none;}
+  input:focus-visible,select:focus-visible,button:focus-visible,textarea:focus-visible{
+    outline:2px solid var(--accent);outline-offset:2px;}
+  button{background:transparent;border:1px solid var(--line);color:var(--text);border-radius:8px;
+    padding:9px 14px;font-family:inherit;font-size:12px;cursor:pointer;transition:border-color .15s,color .15s;}
+  button:hover{border-color:var(--accent);color:var(--accent);}
+  button.solid{background:var(--accent);border-color:var(--accent);color:#07080B;font-weight:600;}
+  button.solid:hover{color:#07080B;filter:brightness(1.08);}
+  .save{font-size:11px;color:var(--muted);align-self:center;margin-left:auto;}
+
+  .runway{margin:26px 0 6px;}
+  .strip{display:grid;grid-template-columns:repeat(30,1fr);gap:4px;}
+  .cell{position:relative;aspect-ratio:9/16;border-radius:3px;border:1px solid var(--line);
+    background:var(--panel2);padding:0;overflow:hidden;transition:transform .12s;}
+  .cell:hover{transform:translateY(-3px);border-color:var(--c);color:inherit;}
+  .fill{position:absolute;left:0;right:0;bottom:0;background:var(--c);opacity:.85;}
+  .cell.on{border-color:var(--c);}
+  .cell.sel{outline:2px solid var(--text);outline-offset:1px;}
+  .cell.today::after{content:"";position:absolute;top:3px;left:50%;width:4px;height:4px;margin-left:-2px;
+    border-radius:50%;background:var(--text);}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:11px;color:var(--muted);}
+  .legend b{display:inline-flex;align-items:center;gap:6px;font-weight:500;}
+  .dot{width:8px;height:8px;border-radius:2px;display:inline-block;}
+
+  .grid{display:grid;grid-template-columns:1.55fr 1fr;gap:14px;margin-top:22px;align-items:start;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;}
+  .daynum{font-family:'Barlow Condensed','Be Vietnam Pro',sans-serif;font-weight:700;font-size:64px;
+    line-height:.8;color:var(--accent);}
+  .dayhead{display:flex;align-items:flex-start;gap:14px;}
+  .phase{font-size:10px;letter-spacing:.2em;color:var(--accent);text-transform:uppercase;}
+  .title{font-size:20px;font-weight:600;margin:4px 0;line-height:1.25;}
+  .goal{color:var(--muted);}
+  .kpi{margin-top:14px;border-left:2px solid var(--accent);padding:8px 0 8px 12px;font-size:13px;}
+  .kpi span{display:block;font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:3px;}
+
+  .tasks{list-style:none;margin:16px 0 0;padding:0;}
+  .check{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;background:transparent;
+    border:0;border-top:1px solid var(--line);border-radius:0;padding:11px 2px;color:var(--text);
+    font-size:13.5px;line-height:1.5;}
+  .check:hover{color:var(--accent);border-color:var(--line);}
+  .box{flex:0 0 17px;width:17px;height:17px;border:1px solid var(--line);border-radius:4px;margin-top:2px;
+    display:flex;align-items:center;justify-content:center;font-size:11px;color:#07080B;}
+  .check.done .box{background:var(--accent);border-color:var(--accent);}
+  .check.done .txt{color:var(--muted);text-decoration:line-through;}
+
+  .tip{margin-top:16px;background:var(--panel2);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--muted);}
+  .tip b{color:var(--accent);font-weight:600;display:block;font-size:10px;letter-spacing:.2em;
+    text-transform:uppercase;margin-bottom:5px;}
+
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+  .metrics input{width:100%;}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:14px;}
+  .stat{background:var(--panel);padding:11px 12px;}
+  .stat b{display:block;font-family:'Barlow Condensed','Be Vietnam Pro',sans-serif;font-size:24px;font-weight:700;line-height:1.1;}
+  .stat i{font-style:normal;font-size:10px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;}
+
+  .chart{margin-top:14px;}
+  .empty{color:var(--muted);font-size:12.5px;padding:26px 0;text-align:center;}
+  .chart svg{width:100%;height:auto;display:block;margin-top:10px;}
+  .ck{font-size:11px;color:var(--muted);display:flex;gap:16px;margin-top:8px;}
+
+  .nav{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;}
+  .nav .right{margin-left:auto;}
+
+  .modal{position:fixed;inset:0;background:rgba(4,5,8,.82);display:flex;align-items:center;
+    justify-content:center;padding:20px;z-index:50;}
+  .modal .card{max-width:640px;width:100%;}
+  textarea.ta{width:100%;height:260px;background:var(--ink);font-family:ui-monospace,monospace;font-size:11px;resize:vertical;}
+  [hidden]{display:none !important;}
+
+  @media (max-width:820px){
+    .grid{grid-template-columns:1fr;}
+    .strip{grid-template-columns:repeat(15,1fr);gap:5px;}
+    .daynum{font-size:48px;}
+  }
+  @media (prefers-reduced-motion:reduce){ .cell:hover{transform:none;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow cond">Quy trình vận hành · 30 ngày · TikTok</div>
+    <h1>Xây kênh theo ngày,<br><em>không xây theo cảm hứng</em></h1>
+    <p class="sub">Mỗi ngày một mục tiêu, một checklist và một ô nhập số. Hết 30 ngày bạn có một kênh đang chạy và một quy trình chạy lại được.</p>
+  </header>
+
+  <div class="bar">
+    <div class="field">
+      <label class="label" for="track">Loại kênh</label>
+      <select id="track"></select>
+    </div>
+    <div class="field">
+      <label class="label" for="start">Ngày bắt đầu</label>
+      <input id="start" type="date">
+    </div>
+    <button id="btnToday" class="solid" hidden></button>
+    <button id="btnExport">Xuất dữ liệu</button>
+    <span class="save" id="saveState"></span>
+  </div>
+
+  <section class="runway">
+    <div class="strip" id="strip"></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <div class="dayhead">
+        <div class="daynum" id="dayNum">01</div>
+        <div>
+          <div class="phase cond" id="dayPhase"></div>
+          <h2 class="title" id="dayTitle"></h2>
+          <div class="goal" id="dayGoal"></div>
+        </div>
+      </div>
+      <div class="kpi"><span>Chỉ tiêu hôm nay</span><span id="dayKpi"></span></div>
+      <ul class="tasks" id="tasks"></ul>
+      <div class="tip"><b>Ghi chú vận hành</b><span id="dayTip"></span></div>
+    </section>
+
+    <section class="card">
+      <div class="label" id="metricLabel">Số liệu</div>
+      <div class="metrics" id="metrics"></div>
+      <div class="stats" id="stats"></div>
+      <div class="tip" style="margin-top:14px"><b id="trackName"></b><span id="trackDesc"></span></div>
+    </section>
+  </div>
+
+  <section class="card chart">
+    <div class="label">Follow cộng dồn so với mục tiêu tham chiếu</div>
+    <div id="chartBox"></div>
+  </section>
+
+  <div class="nav">
+    <button id="btnPrev">Ngày trước</button>
+    <button id="btnNext">Ngày tiếp theo</button>
+    <button id="btnReset" class="right">Xoá toàn bộ tiến độ</button>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="card">
+    <div class="label">Dữ liệu 30 ngày dạng CSV</div>
+    <p style="color:var(--muted);font-size:12.5px;margin:6px 0 10px">Bôi đen toàn bộ và dán vào Google Sheets, chọn tách cột bằng dấu phẩy.</p>
+    <textarea class="ta" id="csv" readonly></textarea>
+    <div style="margin-top:12px"><button class="solid" id="btnClose">Đóng</button></div>
+  </div>
+</div>
+
+<script>
+/* ---------------- DỮ LIỆU ---------------- */
+var TRACKS = [
+  {id:"aff",  name:"Affiliate / TikTok Shop", desc:"Kênh bán hàng, đo bằng đơn và hoa hồng"},
+  {id:"clip", name:"Clip cắt – dịch – tổng hợp", desc:"Kênh viral nuôi tệp, đo bằng view và follow"},
+  {id:"brand",name:"Chuyên gia / Personal brand", desc:"Kênh uy tín, đo bằng inbox và khách tư vấn"}
+];
+var PHASES = [
+  {from:1,to:5,  name:"Nền móng", note:"Định vị, nuôi nick, dựng bộ khung sản xuất", color:"#22E6E0"},
+  {from:6,to:12, name:"Dò tệp",   note:"Đăng đều, test 3 tuyến nội dung, đọc hook",  color:"#7B6CFF"},
+  {from:13,to:21,name:"Khoá tệp", note:"Nhân bản video thắng, series hoá, chuyển đổi",color:"#FF2E63"},
+  {from:22,to:30,name:"Bùng nổ",  note:"Scale sản xuất, đẩy ngân sách, viết SOP",    color:"#FFC93C"}
+];
+var TARGET = [0,0,0,0,0,10,25,45,70,100,150,210,290,390,510,650,820,1020,1250,1520,1830,2180,2570,3000,3480,4000,4570,5190,5860,6600];
+var FIELDS = [
+  {k:"videos",l:"Video đăng"},{k:"views",l:"Lượt xem"},{k:"follows",l:"Follow mới"},
+  {k:"retention",l:"Xem hết (%)"},{k:"comments",l:"Bình luận"},{k:"results",l:"Đơn / inbox"}
+];
+var DAYS = [
+{d:1,title:"Định vị & khai sinh kênh",goal:"Chốt đúng một tệp người xem trước khi quay bất cứ thứ gì.",kpi:"0 video. Việc của hôm nay là dạy thuật toán biết kênh thuộc về đâu.",tasks:["Viết một câu định vị: kênh giúp [ai] [đạt điều gì] bằng [cách nào]","Mô tả tệp người xem: tuổi, vấn đề đang gặp, thứ họ đang tìm trên TikTok","Tạo tài khoản mới bằng SIM và 4G riêng, không dùng VPN, không đăng nhập nhiều nick cùng máy","Đặt tên kênh và username chứa từ khoá ngách, dễ đọc dễ gõ","Lướt For You 30 phút đúng ngách: xem hết, like và lưu 20 video liên quan"],alt:{aff:["Chọn 3 sản phẩm chủ lực có hoa hồng và tồn kho ổn định"],clip:["Chọn 5 kênh nguồn nước ngoài để lấy clip, kiểm tra điều kiện sử dụng lại"],brand:["Chốt 3 chủ đề bạn có thẩm quyền nói và có bằng chứng thật"]},tip:"30 phút lướt đúng ngách trong ngày đầu quyết định phần lớn chất lượng tệp mà TikTok gợi ý cho bạn về sau."},
+{d:2,title:"Dựng profile để chuyển đổi",goal:"Người lạ xem 5 giây trang cá nhân phải hiểu ngay ở lại vì cái gì.",kpi:"Profile hoàn chỉnh, nuôi nick thêm 20–30 phút.",tasks:["Avatar nét, tương phản cao, nhìn rõ ở kích thước nhỏ","Bio 3 dòng: dành cho ai – nhận được gì – bước tiếp theo là gì","Chuyển sang tài khoản phù hợp (Creator hoặc Business) và bật Analytics","Bình luận có nội dung ở 5 video cùng ngách, không spam"],alt:{aff:["Liên kết TikTok Shop và kiểm tra giỏ hàng hiển thị trên profile"],clip:["Gắn link fanpage hoặc nhóm để hứng tệp về nơi bạn sở hữu"],brand:["Gắn link Zalo hoặc form đặt lịch tư vấn"]},tip:"Bio viết cho người xem, không viết cho bạn. Bỏ hết chữ như “chia sẻ những điều hay ho”."},
+{d:3,title:"Giải phẫu 10 kênh đối thủ",goal:"Lấy công thức đang chạy được thay vì tự nghĩ từ đầu.",kpi:"30 video mẫu đã bóc tách, 20 hook chép ra file.",tasks:["Lập danh sách 10 kênh cùng ngách, quy mô 10k–500k follow","Chọn 30 video trên 500k view, ghi lại: hook 3 giây, độ dài, nhịp cắt, câu kết","Xếp 30 video đó vào 3 tuyến nội dung có thể lặp lại","Lưu toàn bộ vào một collection trong app để tra khi bí ý tưởng","Chép 20 câu hook ra file và viết lại bằng ngôn ngữ của tệp bạn nhắm"],tip:"Đừng chép nội dung, chép cấu trúc. Cùng một khung hook có thể dùng lại cho hàng chục chủ đề."},
+{d:4,title:"Bộ khung sản xuất",goal:"Chuẩn hoá để ngày nào cũng dựng được video trong dưới 30 phút.",kpi:"1 template dựng + 3 kịch bản sẵn sàng.",tasks:["Dựng template: font phụ đề, vị trí chữ trong khung an toàn 9:16, bộ nhạc nền, intro dưới 1 giây","Viết 3 kịch bản theo khung Hook – Giá trị – Câu kết mở","Dựng thử 1 bản nháp và xem lại trên điện thoại, không đăng","Đặt tên file và thư mục theo ngày để tra lại số liệu về sau"],alt:{aff:["Chuẩn bị footage sản phẩm: cận cảnh, đang dùng, trước và sau"],clip:["Chạy thử quy trình: tải clip nguồn, cắt, dịch, làm phụ đề, kiểm tra lại nghĩa"],brand:["Chọn góc quay và ánh sáng cố định để mọi video nhận ra ngay là bạn"]},tip:"Chữ nằm cách mép trên 15% và mép dưới 20% để không bị giao diện TikTok che."},
+{d:5,title:"Lịch 30 ngày và 5 video dự trữ",goal:"Có sẵn hàng trong kho trước khi lên sóng, để không bao giờ đứt nhịp.",kpi:"5 video đã dựng xong, lịch 7 ngày đầu đã xếp.",tasks:["Chốt 3 tuyến nội dung A, B, C và số video mỗi tuyến trong tuần","Xếp lịch 7 ngày đầu: tuyến nào, ngày nào, khung giờ nào","Sản xuất trước 5 video dự trữ","Chọn 2 khung giờ đăng cố định để test: 11h–13h và 19h–21h30","Đặt quy tắc: một video chỉ nói một ý"],tip:"Kênh chết vì đứt nhịp nhiều hơn vì nội dung dở. Kho dự trữ là bảo hiểm cho nhịp đăng."},
+{d:6,title:"Video đầu tiên lên sóng",goal:"Bắt đầu tính ngày. Từ hôm nay số liệu mới có ý nghĩa.",kpi:"1 video, mục tiêu trên 300 view tự nhiên.",tasks:["Đăng video tuyến A vào khung giờ đã chọn","Caption kết bằng một câu hỏi mở để mồi bình luận","Dùng 3–5 hashtag: 1 rộng, 2 ngách, 1 của riêng kênh","Trả lời 100% bình luận trong 60 phút đầu","Ghi số liệu ở mốc 2 giờ và 24 giờ"],tip:"60 phút đầu là cửa sổ phân phối. Tương tác trong khung này quyết định video có được đẩy vòng tiếp theo hay không."},
+{d:7,title:"Đọc hook 3 giây",goal:"Biết chính xác người xem rơi ở giây thứ mấy.",kpi:"Trên 55% người xem vượt qua giây thứ 3.",tasks:["Mở Analytics, xem biểu đồ giữ chân của video hôm qua","Ghi lại tỉ lệ vượt 3 giây và điểm rơi mạnh nhất","Đăng video tuyến B","Nếu dưới 55%, viết lại hook: bỏ mọi câu chào, vào thẳng vấn đề ở khung hình đầu","Bình luận sang 10 kênh cùng ngách để kéo tương tác chéo"],tip:"Hook không phải câu nói, là khung hình đầu tiên. Chữ to, hình động, một câu hỏi nhức nhối."},
+{d:8,title:"Test độ dài video",goal:"Tìm độ dài mà tệp của bạn chịu xem hết.",kpi:"Tỉ lệ xem hết trên 35%.",tasks:["Đăng 1 video dưới 20 giây và 1 video 45–60 giây trong cùng ngày","So tỉ lệ xem hết của hai bản","Cắt bỏ mọi đoạn không phục vụ câu kết","Ghi kết quả vào bảng số liệu"],tip:"Video ngắn dễ lên view, video dài dễ ra đơn và ra follow. Cần cả hai, đúng thời điểm."},
+{d:9,title:"Trend và nhạc nền",goal:"Mượn lực đẩy có sẵn thay vì tự tạo lực.",kpi:"1 video bắt trend, giữ đúng ngách.",tasks:["Vào TikTok Creative Center, lọc trend theo ngành và theo Việt Nam trong 7 ngày","Chọn 1 trend còn dưới 3 ngày tuổi và ghép vào tuyến nội dung của bạn","Đăng video tuyến C","Loại mọi trend không liên quan tệp, dù đang rất nóng"],tip:"Trend lệch ngách kéo về view rác, làm loãng tệp và hại vòng đề xuất trong nhiều ngày sau."},
+{d:10,title:"Chốt sổ tuần 1",goal:"Nhìn số, không nhìn cảm giác.",kpi:"Cộng dồn khoảng 100 follow, nhận ra 1 tuyến mạnh nhất.",tasks:["Lập bảng: video, tuyến, độ dài, view, tỉ lệ 3 giây, tỉ lệ xem hết, follow thu được","Xếp hạng 3 tuyến theo follow trên mỗi 1000 view","Ghi ra 3 điều lặp lại ở các video tốt nhất","Bỏ hẳn cách làm của video kém nhất"],tip:"Chỉ số đáng tin nhất giai đoạn này là follow trên mỗi 1000 view, không phải tổng view."},
+{d:11,title:"Nhân bản video thắng",goal:"Video tốt không đăng một lần rồi thôi.",kpi:"3 biến thể từ 1 video thắng.",tasks:["Lấy video tốt nhất tuần 1, làm lại 3 bản: đổi hook, đổi ví dụ, đổi câu kết","Giữ nguyên cấu trúc và nhịp cắt đã hiệu quả","Đăng 1 bản hôm nay, để dành 2 bản cho tuần sau"],tip:"Người xem không nhớ bạn đã nói gì tuần trước. Thuật toán cũng không phạt nội dung lặp có biến thể."},
+{d:12,title:"Tăng nhịp lên 2 video mỗi ngày",goal:"Tăng số lần chạm để tìm video bùng.",kpi:"2 video mỗi ngày, cách nhau ít nhất 4 tiếng.",tasks:["Đăng 2 video ở 2 khung giờ khác nhau","Rút kho dự trữ và bổ sung lại ngay trong ngày","Ghim video có tỉ lệ giữ chân tốt nhất lên trang cá nhân"],tip:"Đừng đăng hai video sát nhau. Chúng sẽ giành lượt phân phối của nhau."},
+{d:13,title:"Bắt tệp bằng nội dung phản trực giác",goal:"Chạm vào thứ nhiều người tin nhưng không đúng.",kpi:"Bình luận tăng ít nhất gấp đôi ngày thường.",tasks:["Liệt kê 10 điều tệp của bạn đang hiểu sai hoặc không biết","Chọn 1 điều có bằng chứng rõ ràng, dựng thành video","Nói phần đông tin gì trước, rồi mới đưa dữ liệu ngược lại","Chuẩn bị sẵn câu trả lời cho luồng phản đối trong bình luận"],tip:"Đi hướng giải pháp và sự thật ít người biết, tránh giọng cảnh báo doạ dẫm. Doạ kéo view nhưng đốt niềm tin."},
+{d:14,title:"Biến bình luận thành nội dung",goal:"Nguồn ý tưởng rẻ nhất và trúng nhất nằm ngay dưới video của bạn.",kpi:"2 video trả lời bình luận.",tasks:["Lọc 10 bình luận hỏi nhiều nhất trong 8 ngày qua","Dùng tính năng trả lời bình luận bằng video cho 2 câu hỏi","Ghim bình luận tốt nhất ở mỗi video"],tip:"Câu hỏi lặp lại ba lần trở lên là một tuyến nội dung, không phải một video."},
+{d:15,title:"Chốt sổ tuần 2 và chọn tuyến chủ lực",goal:"Từ đây kênh phải có một tuyến rõ ràng.",kpi:"Cộng dồn khoảng 500 follow.",tasks:["So số liệu tuần 2 với tuần 1 theo cùng bộ chỉ số","Chọn 1 tuyến chủ lực chiếm 60% nội dung, 2 tuyến còn lại chia 40%","Kiểm tra Analytics phần khán giả: tuổi, giới tính, khung giờ hoạt động","Đổi khung giờ đăng theo dữ liệu thật, không theo lời khuyên chung"],tip:"Nếu tệp khán giả lệch hẳn so với tệp bạn nhắm ban đầu, sửa định vị chứ đừng ép người xem."},
+{d:16,title:"Series hoá tuyến chủ lực",goal:"Cho người xem lý do bấm theo dõi chứ không chỉ xem lướt.",kpi:"Series 5 tập đã lên lịch.",tasks:["Đặt tên series và làm nhận diện riêng: khung mở đầu, màu chữ, câu mở cố định","Viết đề cương 5 tập, mỗi tập kết bằng câu mồi cho tập sau","Đăng tập 1 và ghim lên đầu trang","Thêm series vào playlist để người xem cày liên tục"],tip:"Follow đến từ kỳ vọng về video tiếp theo. Series là cách rẻ nhất tạo ra kỳ vọng đó."},
+{d:17,title:"Trang cá nhân thành trang bán hàng",goal:"Người xem tò mò bấm vào profile phải có đường đi tiếp.",kpi:"3 video ghim đúng vai trò.",tasks:["Ghim 3 video: 1 giới thiệu bạn là ai, 1 chứng minh giá trị, 1 dẫn tới hành động","Cập nhật lại bio theo tệp thật đã lộ ra trong Analytics","Kiểm tra toàn bộ link, giỏ hàng, form trên điện thoại"],alt:{aff:["Kiểm tra giá, tồn kho và mã giảm giá của 3 sản phẩm chủ lực"],clip:["Đặt lời kêu gọi về fanpage hoặc nhóm ở cuối video chủ lực"],brand:["Thêm một video kể một ca thực tế bạn đã xử lý"]},tip:"Tỉ lệ bấm vào profile trên mỗi 1000 view là chỉ số dự báo doanh thu sớm nhất."},
+{d:18,title:"Buổi live hoặc tương tác sâu đầu tiên",goal:"Đẩy quan hệ từ lướt qua sang nhớ mặt.",kpi:"30 phút live hoặc 1 phiên hỏi đáp trong bình luận.",tasks:["Đăng 1 video báo trước giờ live trong ngày","Live 30–60 phút theo đúng tuyến chủ lực, chuẩn bị sẵn 5 câu hỏi mồi","Ghi lại các câu hỏi xuất hiện trong live để làm nội dung tuần sau","Cắt 2 đoạn hay nhất trong live thành video ngắn"],tip:"Live đầu tiên đừng đặt mục tiêu bán. Mục tiêu là biết người xem thật sự hỏi gì."},
+{d:19,title:"Kéo tỉ lệ xem hết lên 50%",goal:"Sửa phần giữa video, nơi người xem rơi nhiều nhất.",kpi:"Tỉ lệ xem hết trên 45%.",tasks:["Xem biểu đồ giữ chân của 5 video gần nhất, đánh dấu điểm rơi chung","Cắt bỏ đoạn dẫn dắt thừa ngay trước điểm rơi","Thêm mốc đổi cảnh hoặc chữ mỗi 2–3 giây ở nửa sau","Đặt câu trả lời quan trọng nhất ở gần cuối, báo trước ngay đầu video"],tip:"Muốn người xem ở lại đến cuối, phải hứa ở giây đầu rằng cuối có gì."},
+{d:20,title:"Dọn kênh và chốt số",goal:"Giữ mật độ chất lượng cao trên trang cá nhân.",kpi:"Cộng dồn khoảng 1500 follow.",tasks:["Ẩn video dưới 300 view và không mang lại follow","Cập nhật bảng số liệu 20 ngày","Chọn 5 video tốt nhất để làm nguyên liệu nhân bản tuần sau"],tip:"Ẩn chứ đừng xoá. Số liệu của video kém vẫn là dữ liệu để học."},
+{d:21,title:"Video chuyển đổi đầu tiên",goal:"Thử bán, sau khi đã có ba tuần cho giá trị.",kpi:"Có đơn hoặc inbox đầu tiên từ kênh.",tasks:["Dựng video theo khung: vấn đề – vì sao cách cũ không hiệu quả – giải pháp – bằng chứng – hành động","Chỉ một lời kêu gọi duy nhất trong video","Trả lời mọi bình luận mang tính hỏi mua trong 30 phút","Ghi lại tỉ lệ bấm vào giỏ hàng hoặc link trên mỗi 1000 view"],alt:{aff:["Quay cận cảnh trải nghiệm thật với sản phẩm, tránh giọng quảng cáo"],clip:["Dẫn về fanpage hoặc nhóm trước, bán ở kênh sở hữu chứ không bán ngay trên video"],brand:["Mời đặt lịch tư vấn giới hạn số lượng trong tuần"]},tip:"Tỉ lệ 4 video giá trị đổi 1 video bán là mức tệp Việt chấp nhận được mà không tụt tương tác."},
+{d:22,title:"Scale sản xuất bằng quy trình",goal:"Tăng sản lượng mà không tăng thời gian làm.",kpi:"3 video mỗi ngày, thời gian dựng dưới 25 phút mỗi video.",tasks:["Tách quy trình thành 4 khâu: ý tưởng, kịch bản, quay hoặc dựng nguyên liệu, hậu kỳ","Gom mỗi khâu làm một lượt cho cả tuần thay vì làm tuần tự từng video","Đưa khâu lặp lại nhiều nhất vào công cụ hoặc giao cho người khác","Đo lại thời gian thực tế của từng khâu"],tip:"Khâu ngốn thời gian nhất thường là hậu kỳ và tìm ý tưởng. Đó là hai chỗ nên tự động hoá trước."},
+{d:23,title:"Đẩy ngân sách nhỏ",goal:"Mua thêm lượt phân phối cho video đã chứng minh được hiệu quả.",kpi:"1 video đang chạy, ngân sách nhỏ, có mốc dừng rõ ràng.",tasks:["Chọn video có tỉ lệ xem hết cao nhất và có follow tự nhiên tốt","Chạy Promote hoặc chiến dịch nhỏ, đặt mục tiêu theo dõi hoặc truy cập profile","Đặt trần ngân sách ngày và mốc dừng trước khi bấm chạy","Ghi lại chi phí trên mỗi follow hoặc trên mỗi đơn"],tip:"Chỉ đẩy tiền vào video đã thắng tự nhiên. Ngân sách không cứu được nội dung yếu, chỉ làm lộ ra nhanh hơn."},
+{d:24,title:"Đọc số và cắt lỗ",goal:"Quyết định trong 24 giờ, không nuôi hy vọng.",kpi:"Chi phí trên mỗi follow hoặc mỗi đơn nằm trong ngưỡng bạn đặt.",tasks:["So chi phí trên mỗi kết quả với ngưỡng đã đặt hôm qua","Tắt phần chi tiêu không đạt, dồn sang video hiệu quả nhất","Vẫn giữ nhịp đăng tự nhiên, không để ads thay thế nội dung"],tip:"Ads chỉ khuếch đại thứ đang có. Kênh yếu mà đẩy tiền thì kết quả là học phí."},
+{d:25,title:"Chốt sổ tuần 3",goal:"Nhìn xu hướng ba tuần liền, không nhìn từng ngày.",kpi:"Cộng dồn khoảng 3500 follow.",tasks:["Vẽ đường tăng trưởng follow và view theo tuần","Tính follow trên mỗi 1000 view và tỉ lệ vào profile theo tuần","Ghi ra 3 việc sẽ giữ và 3 việc sẽ bỏ ở tuần cuối"],tip:"Nếu đường tăng trưởng đi ngang hai tuần liền, vấn đề nằm ở tuyến nội dung chứ không ở tần suất."},
+{d:26,title:"Mở rộng tệp bằng hợp tác",goal:"Vay tệp của người khác thay vì tự xây từ đầu.",kpi:"1 video hợp tác hoặc duet đã lên sóng.",tasks:["Chọn 5 kênh cùng tệp nhưng không cạnh tranh trực tiếp","Đề xuất hợp tác cụ thể: nội dung gì, ai được gì, đăng khi nào","Làm duet hoặc stitch với 1 video đang lên của kênh lớn hơn, giữ đúng ngách"],tip:"Stitch một video đang lên là cách rẻ nhất để chạm vào tệp mới trong ngày."},
+{d:27,title:"Tối ưu đường chuyển đổi",goal:"Sửa chỗ rơi giữa xem video và ra hành động.",kpi:"Tỉ lệ chuyển đổi tăng so với ngày 21.",tasks:["Đếm lại từng bước: xem video, vào profile, bấm link hoặc giỏ hàng, ra kết quả","Tìm bước rơi mạnh nhất và chỉ sửa đúng bước đó","Thử một lời kêu gọi khác trong 3 video liên tiếp và so kết quả"],tip:"Phần lớn kênh rơi ở bước từ video sang profile. Nguyên nhân thường là video không cho lý do bấm vào tên kênh."},
+{d:28,title:"Nạp kho cho 2 tuần tới",goal:"Bước sang tháng thứ hai với kho đầy.",kpi:"10 video dự trữ đã dựng xong.",tasks:["Liệt kê 20 ý tưởng từ bình luận, live và các video thắng","Dựng 10 video theo lô, dùng đúng template đã chuẩn hoá","Xếp lịch đăng 2 tuần tới theo tỉ lệ 60% tuyến chủ lực"],tip:"Ý tưởng nên đến từ dữ liệu của chính kênh bạn, không phải từ việc lướt thêm."},
+{d:29,title:"Viết SOP cho kênh",goal:"Biến kết quả 30 ngày thành thứ người khác chạy lại được.",kpi:"1 tài liệu quy trình dùng được ngay.",tasks:["Ghi lại toàn bộ quy trình từ ý tưởng đến đăng, kèm thời gian chuẩn mỗi khâu","Đính kèm template dựng, danh sách hook, bộ hashtag và khung giờ đăng","Ghi rõ ngưỡng số liệu: khi nào nhân bản, khi nào bỏ, khi nào đẩy ngân sách","Giao thử một khâu cho người khác chạy theo tài liệu"],tip:"SOP tốt là SOP mà người mới đọc xong làm được video đầu tiên trong ngày đầu tiên."},
+{d:30,title:"Tổng kết và kế hoạch 30 ngày kế tiếp",goal:"Chốt bài học và đặt mục tiêu tháng sau bằng số.",kpi:"Báo cáo 30 ngày và mục tiêu tháng 2 đã viết xong.",tasks:["Tổng hợp: tổng view, follow, tỉ lệ giữ chân trung bình, kết quả kinh doanh","Chọn 5 video hiệu quả nhất và ghi công thức chung của chúng","Đặt 3 mục tiêu số cho 30 ngày tiếp theo và một việc sẽ ngừng làm","Quyết định: giữ một kênh và nhân sâu, hay mở kênh thứ hai theo cùng SOP"],tip:"Tháng đầu là tìm công thức. Tháng thứ hai là lặp lại công thức đó nhiều lần hơn, không phải tìm công thức mới."}
+];
+
+/* ---------------- TRẠNG THÁI ---------------- */
+var KEY = "tiktok30:v1";
+var S = {track:"aff", startDate:"", checks:{}, metrics:{}};
+var sel = 1;
+
+try{
+  var raw = localStorage.getItem(KEY);
+  if(raw){ var p = JSON.parse(raw); if(p && typeof p === "object"){ S = Object.assign(S, p); } }
+}catch(e){}
+
+var saveTimer = null;
+function save(){
+  var el = document.getElementById("saveState");
+  el.textContent = "Đang lưu…";
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){
+    try{ localStorage.setItem(KEY, JSON.stringify(S)); el.textContent = "Đã lưu trên máy này"; }
+    catch(e){ el.textContent = "Không lưu được"; }
+  }, 400);
+}
+
+/* ---------------- TIỆN ÍCH ---------------- */
+function phaseOf(d){ for(var i=0;i<PHASES.length;i++){ if(d>=PHASES[i].from && d<=PHASES[i].to) return PHASES[i]; } return PHASES[0]; }
+function tasksFor(day, track){ var ex = (day.alt && day.alt[track]) ? day.alt[track] : []; return day.tasks.concat(ex); }
+function fmt(n){ if(n>=1e6) return (n/1e6).toFixed(1).replace(".0","")+"M"; if(n>=1e3) return (n/1e3).toFixed(1).replace(".0","")+"K"; return String(n); }
+function todayIndex(){
+  if(!S.startDate) return null;
+  var st = new Date(S.startDate+"T00:00:00"); if(isNaN(st.getTime())) return null;
+  var diff = Math.floor((new Date() - st)/86400000)+1;
+  return (diff>=1 && diff<=30) ? diff : null;
+}
+function dateOfDay(d){
+  if(!S.startDate) return "";
+  var st = new Date(S.startDate+"T00:00:00"); if(isNaN(st.getTime())) return "";
+  var x = new Date(st.getTime()+(d-1)*86400000);
+  return ("0"+x.getDate()).slice(-2)+"/"+("0"+(x.getMonth()+1)).slice(-2);
+}
+function dayProgress(d){
+  var list = tasksFor(DAYS[d-1], S.track), done = 0;
+  for(var i=0;i<list.length;i++){ if(S.checks[d+"|"+i]) done++; }
+  return list.length ? done/list.length : 0;
+}
+function trackObj(){ for(var i=0;i<TRACKS.length;i++){ if(TRACKS[i].id===S.track) return TRACKS[i]; } return TRACKS[0]; }
+
+/* ---------------- DỰNG GIAO DIỆN ---------------- */
+var elTrack = document.getElementById("track");
+TRACKS.forEach(function(t){ var o=document.createElement("option"); o.value=t.id; o.textContent=t.name; elTrack.appendChild(o); });
+elTrack.value = S.track;
+document.getElementById("start").value = S.startDate;
+
+document.getElementById("legend").innerHTML = PHASES.map(function(p){
+  return '<b><i class="dot" style="background:'+p.color+'"></i>Ngày '+p.from+'–'+p.to+' · '+p.name+': '+p.note+'</b>';
+}).join("");
+
+var elStrip = document.getElementById("strip");
+DAYS.forEach(function(dd){
+  var b = document.createElement("button");
+  b.className = "cell"; b.dataset.d = dd.d;
+  b.innerHTML = '<span class="fill"></span>';
+  b.addEventListener("click", function(){ sel = dd.d; render(); });
+  elStrip.appendChild(b);
+});
+
+var elMetrics = document.getElementById("metrics");
+FIELDS.forEach(function(f){
+  var w = document.createElement("div"); w.className = "field";
+  w.innerHTML = '<label class="label" for="m-'+f.k+'">'+f.l+'</label>'+
+                '<input id="m-'+f.k+'" type="number" min="0" placeholder="0">';
+  elMetrics.appendChild(w);
+  w.querySelector("input").addEventListener("input", function(e){
+    if(!S.metrics[sel]) S.metrics[sel] = {};
+    S.metrics[sel][f.k] = e.target.value === "" ? "" : Number(e.target.value);
+    save(); renderStrip(); renderStats(); renderChart();
+  });
+});
+
+function totals(){
+  var t = {views:0,follows:0,videos:0,results:0,filled:0};
+  for(var d=1; d<=30; d++){
+    var m = S.metrics[d]; if(!m) continue;
+    var has = false;
+    for(var k in m){ if(m[k] !== "" && m[k] != null) has = true; }
+    if(has) t.filled++;
+    t.views += Number(m.views)||0; t.follows += Number(m.follows)||0;
+    t.videos += Number(m.videos)||0; t.results += Number(m.results)||0;
+  }
+  var all = 0;
+  DAYS.forEach(function(dd){ all += tasksFor(dd, S.track).length; });
+  var done = 0;
+  for(var kk in S.checks){ if(S.checks[kk]) done++; }
+  t.pct = all ? Math.round(done/all*100) : 0;
+  t.per1k = t.views ? Math.round(t.follows/t.views*1000) : 0;
+  return t;
+}
+
+function renderStrip(){
+  var today = todayIndex();
+  Array.prototype.forEach.call(elStrip.children, function(b){
+    var d = Number(b.dataset.d), p = dayProgress(d), ph = phaseOf(d);
+    b.style.setProperty("--c", ph.color);
+    b.className = "cell" + (p>0?" on":"") + (d===sel?" sel":"") + (d===today?" today":"");
+    b.querySelector(".fill").style.height = (p*100)+"%";
+    b.setAttribute("aria-label", "Ngày "+d+": "+DAYS[d-1].title+", hoàn thành "+Math.round(p*100)+"%");
+  });
+}
+
+function renderDay(){
+  var day = DAYS[sel-1], ph = phaseOf(sel);
+  document.documentElement.style.setProperty("--accent", ph.color);
+  document.getElementById("dayNum").textContent = ("0"+sel).slice(-2);
+  document.getElementById("dayPhase").textContent = ph.name + (dateOfDay(sel) ? " · "+dateOfDay(sel) : "");
+  document.getElementById("dayTitle").textContent = day.title;
+  document.getElementById("dayGoal").textContent = day.goal;
+  document.getElementById("dayKpi").textContent = day.kpi;
+  document.getElementById("dayTip").textContent = day.tip;
+  document.getElementById("metricLabel").textContent = "Số liệu ngày " + sel;
+
+  var list = tasksFor(day, S.track);
+  var ul = document.getElementById("tasks");
+  ul.innerHTML = "";
+  list.forEach(function(t, i){
+    var done = !!S.checks[sel+"|"+i];
+    var li = document.createElement("li");
+    var b = document.createElement("button");
+    b.className = "check" + (done ? " done" : "");
+    b.setAttribute("aria-pressed", done ? "true" : "false");
+    b.innerHTML = '<span class="box">'+(done?"✓":"")+'</span><span class="txt"></span>';
+    b.querySelector(".txt").textContent = t;
+    b.addEventListener("click", function(){
+      S.checks[sel+"|"+i] = !S.checks[sel+"|"+i];
+      save(); renderDay(); renderStrip(); renderStats();
+    });
+    li.appendChild(b); ul.appendChild(li);
+  });
+
+  FIELDS.forEach(function(f){
+    var m = S.metrics[sel] || {};
+    document.getElementById("m-"+f.k).value = (m[f.k] === undefined || m[f.k] === null) ? "" : m[f.k];
+  });
+
+  var tr = trackObj();
+  document.getElementById("trackName").textContent = tr.name;
+  document.getElementById("trackDesc").textContent = tr.desc + ". Đổi loại kênh sẽ đổi các việc đặc thù ở cuối mỗi checklist.";
+
+  var today = todayIndex(), bt = document.getElementById("btnToday");
+  if(today){ bt.hidden = false; bt.textContent = "Về ngày " + today; } else { bt.hidden = true; }
+}
+
+function renderStats(){
+  var t = totals();
+  var rows = [
+    [t.pct+"%","Việc đã xong"], [fmt(t.follows),"Follow cộng dồn"],
+    [fmt(t.views),"View cộng dồn"], [t.videos,"Video đã đăng"],
+    [t.per1k,"Follow / 1000 view"], [t.results,"Đơn / inbox"]
+  ];
+  document.getElementById("stats").innerHTML = rows.map(function(r){
+    return '<div class="stat"><b>'+r[0]+'</b><i>'+r[1]+'</i></div>';
+  }).join("");
+}
+
+function renderChart(){
+  var box = document.getElementById("chartBox");
+  var t = totals();
+  if(t.filled === 0){
+    box.innerHTML = '<div class="empty">Nhập số liệu ở ô bên trên để đường tăng trưởng bắt đầu hiện ra.</div>';
+    return;
+  }
+  var cum = 0, last = 0, actual = [];
+  for(var d=1; d<=30; d++){
+    var m = S.metrics[d];
+    if(m && m.follows !== "" && m.follows != null){ cum += Number(m.follows)||0; last = d; }
+    actual.push(d <= last ? cum : null);
+  }
+  var W = 620, H = 240, PL = 44, PR = 10, PT = 12, PB = 26;
+  var maxV = Math.max(cum, TARGET[29], 10);
+  var x = function(d){ return PL + (d-1)/29 * (W-PL-PR); };
+  var y = function(v){ return H-PB - (v/maxV) * (H-PT-PB); };
+  var accent = phaseOf(sel).color;
+
+  var gridY = "", ticks = [0,.25,.5,.75,1];
+  ticks.forEach(function(f){
+    var v = maxV*f, yy = y(v);
+    gridY += '<line x1="'+PL+'" y1="'+yy+'" x2="'+(W-PR)+'" y2="'+yy+'" stroke="#1B2231"/>'+
+             '<text x="'+(PL-8)+'" y="'+(yy+4)+'" text-anchor="end" fill="#7D879B" font-size="10">'+fmt(Math.round(v))+'</text>';
+  });
+  var gridX = "";
+  [1,5,10,15,20,25,30].forEach(function(d){
+    gridX += '<text x="'+x(d)+'" y="'+(H-8)+'" text-anchor="middle" fill="#7D879B" font-size="10">'+d+'</text>';
+  });
+  var tp = TARGET.map(function(v,i){ return x(i+1)+","+y(v); }).join(" ");
+  var ap = [], dots = "";
+  actual.forEach(function(v,i){
+    if(v === null) return;
+    ap.push(x(i+1)+","+y(v));
+    dots += '<circle cx="'+x(i+1)+'" cy="'+y(v)+'" r="2.6" fill="'+accent+'"/>';
+  });
+
+  box.innerHTML =
+    '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Biểu đồ follow cộng dồn so với mục tiêu">'+
+      gridY + gridX +
+      '<polyline points="'+tp+'" fill="none" stroke="#3A4560" stroke-width="1.5" stroke-dasharray="4 4"/>'+
+      '<polyline points="'+ap.join(" ")+'" fill="none" stroke="'+accent+'" stroke-width="2.5" stroke-linejoin="round"/>'+
+      dots +
+    '</svg>'+
+    '<div class="ck"><span style="color:'+accent+'">— Thực tế</span><span>--- Mục tiêu tham chiếu</span></div>';
+}
+
+function render(){ renderDay(); renderStrip(); renderStats(); renderChart(); }
+
+/* ---------------- SỰ KIỆN ---------------- */
+elTrack.addEventListener("change", function(e){ S.track = e.target.value; save(); render(); });
+document.getElementById("start").addEventListener("change", function(e){
+  S.startDate = e.target.value; save();
+  var t = todayIndex(); if(t) sel = t;
+  render();
+});
+document.getElementById("btnToday").addEventListener("click", function(){ var t = todayIndex(); if(t){ sel = t; render(); } });
+document.getElementById("btnPrev").addEventListener("click", function(){ sel = Math.max(1, sel-1); render(); });
+document.getElementById("btnNext").addEventListener("click", function(){ sel = Math.min(30, sel+1); render(); });
+document.getElementById("btnReset").addEventListener("click", function(){
+  if(confirm("Xoá toàn bộ checklist và số liệu đã nhập?")){ S.checks = {}; S.metrics = {}; sel = 1; save(); render(); }
+});
+document.getElementById("btnExport").addEventListener("click", function(){
+  var head = "Ngay,Ngay thuc te,Giai doan,Tieu de,Hoan thanh,Video,View,Follow,XemHet%,Binhluan,Ketqua";
+  var rows = DAYS.map(function(dd){
+    var m = S.metrics[dd.d] || {};
+    var g = function(k){ return (m[k] === undefined || m[k] === null) ? "" : m[k]; };
+    return [dd.d, dateOfDay(dd.d), phaseOf(dd.d).name, '"'+dd.title+'"',
+            Math.round(dayProgress(dd.d)*100)+"%", g("videos"), g("views"), g("follows"),
+            g("retention"), g("comments"), g("results")].join(",");
+  });
+  document.getElementById("csv").value = [head].concat(rows).join("\n");
+  document.getElementById("modal").hidden = false;
+  document.getElementById("csv").focus();
+});
+document.getElementById("btnClose").addEventListener("click", function(){ document.getElementById("modal").hidden = true; });
+document.getElementById("modal").addEventListener("click", function(e){ if(e.target.id === "modal") this.hidden = true; });
+document.addEventListener("keydown", function(e){ if(e.key === "Escape") document.getElementById("modal").hidden = true; });
+
+var t0 = todayIndex(); if(t0) sel = t0;
+render();
+document.getElementById("saveState").textContent = "Dữ liệu lưu trên máy này";
+</script>
+</body>
+</html>
